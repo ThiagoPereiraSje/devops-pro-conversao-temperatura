@@ -1,0 +1,44 @@
+apiVersion: apps/v1 # Verificar com kubectl api-resources
+kind: Deployment
+metadata:
+  name: conversaotemperatura
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: conversaotemperatura
+  template:
+    metadata:
+      labels:
+        app: conversaotemperatura
+    spec:
+      containers:
+        - name: conversao
+          image: thiagopereira/conversao-temperatura:v1
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: conversaotemperatura
+spec:
+  selector:
+    app: conversaotemperatura
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 30000
+  type: NodePort
